@@ -1,0 +1,22 @@
+# Archivos de configuración y caché de Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Carpetas de compilación
+bin/
+obj/
+Debug/
+Release/
+
+# Archivos temporales
+*.log
+*.tmp
+*.temp
+
+# Paquetes NuGet
+*.nupkg
+*.snupkg
+packages/
