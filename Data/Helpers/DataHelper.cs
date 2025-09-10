@@ -26,6 +26,8 @@ namespace PIIPractica01.Data.Helpers
             return _instance;
         }
 
+
+
         public DataTable ExecuteSpQuery(string sp, List<SpParameter>? param = null)
         {
             DataTable dt = new DataTable();

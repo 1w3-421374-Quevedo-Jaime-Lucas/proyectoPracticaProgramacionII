@@ -1,0 +1,118 @@
+USE master
+GO
+
+CREATE DATABASE Practica01
+go 
+USE Practica01
+go
+CREATE TABLE ARTICULOS(
+	id int IDENTITY(1,1) NOT NULL,
+	nombre varchar(30) NULL,
+	precio_Unitario decimal(10,2) NULL,
+	esta_activo bit NULL,
+  CONSTRAINT pk_articulos PRIMARY KEY (id)
+  )
+
+  CREATE TABLE FACTURAS(
+	nro_Factura int IDENTITY(1,1) NOT NULL,
+	fecha datetime NULL,
+	id_forma_Pago int NULL,
+	cliente varchar(20) NULL,
+ CONSTRAINT pk_facturas PRIMARY KEY (nro_factura)
+ )
+
+CREATE TABLE DETALLES_FACTURAS(
+	nro_detalle int IDENTITY(1,1) NOT NULL,
+	id_articulo int,
+	id_factura int,
+	cantidad int,
+	precio_vendido decimal(10, 2) NULL
+
+ CONSTRAINT pk_detalles_facturas PRIMARY KEY (nro_detalle)
+ CONSTRAINT fk_id_articulo FOREIGN KEY (id_articulo) REFERENCES ARTICULOS (id),
+ CONSTRAINT fk_id_factura FOREIGN KEY (id_factura) REFERENCES FACTURAS (nro_factura)
+ )
+
+
+CREATE TABLE FORMAS_PAGO
+(
+	id int IDENTITY(1,1) NOT NULL,
+	nombre varchar(20) NULL,
+ CONSTRAINT pk_formas_Pago PRIMARY KEY (id) 
+)
+
+
+
+------------------------------------------------------------TODO RELACIONADO CON DETALLES FACTURAS---------------------------------------------------------------
+go 
+
+CREATE PROCEDURE sp_AGREGAR_DETALLE
+    @id_factura INT,
+    @id_articulo INT,
+    @cantidad INT,
+	@precio_vendido decimal(10,2)
+AS
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM DETALLES_FACTURAS 
+        WHERE id_factura = @id_factura 
+          AND id_articulo = @id_articulo
+    )
+    BEGIN
+
+        UPDATE DETALLES_FACTURAS
+        SET cantidad = cantidad + @cantidad
+        WHERE id_factura = @id_factura 
+          AND id_articulo = @id_articulo;
+    END
+    ELSE
+    BEGIN
+
+        INSERT INTO DETALLES_FACTURAS (id_articulo, id_factura, cantidad, precio_vendido)
+        VALUES (@id_articulo, @id_factura, @cantidad, @precio_vendido);
+    END
+END;
+
+GO
+
+------------------------------------------------------------TODO RELACIONADO CON FACTURA---------------------------------------------------------------
+
+CREATE PROCEDURE SP_INSERTAR_MAESTRO_FACTURAS
+	@id_forma_pago int,
+	@cliente varchar(50),
+	@id int output
+AS
+BEGIN
+	INSERT INTO FACTURAS(id_forma_Pago, fecha, cliente) VALUES (@id_forma_pago, GETDATE(), @cliente);
+	SET @id = SCOPE_IDENTITY();
+END
+GO
+
+
+
+CREATE PROCEDURE SP_RECUPERAR_FACTURAS
+as
+BEGIN
+	SELECT f.nro_Factura, f.fecha, f.cliente, a.nombre, df.precio_vendido, df.cantidad, fp.nombre 
+	FROM FACTURAS f
+	   JOIN DETALLES_FACTURAS df ON df.id_factura = f.nro_Factura
+	   JOIN ARTICULOS a ON (a.id = df.id_articulo) 
+	   JOIN FORMAS_PAGO fp ON fp.id = f.id_forma_Pago
+END
+GO
+
+
+
+CREATE PROCEDURE SP_RECUPERAR_FACTURAS_POR_ID
+	@nro_factura int
+AS
+BEGIN
+	SELECT f.nro_Factura, f.fecha, f.cliente, a.nombre, df.precio_vendido, df.cantidad, fp.nombre 
+	FROM FACTURAS f
+	   JOIN DETALLES_FACTURAS df ON df.id_factura = f.nro_Factura
+	   JOIN ARTICULOS a ON (a.id = df.id_articulo) 
+	   JOIN FORMAS_PAGO fp ON fp.id = f.id_forma_Pago
+	  WHERE f.nro_Factura = @nro_factura;
+END
+

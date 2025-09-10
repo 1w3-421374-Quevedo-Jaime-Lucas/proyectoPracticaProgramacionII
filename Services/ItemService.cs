@@ -27,7 +27,7 @@ namespace PIIPractica01.Services
             return _itemRepository.GetById(id);
         }
 
-        public bool SaveIngredient(Item item)
+        public bool SaveItem(Item item)
         {
             return _itemRepository.Save(item);
         }

@@ -16,6 +16,11 @@ namespace PIIPractica01.Data.Implementations
     {
         PaymentForm paymentForm = new PaymentForm();
         Item item = new Item();
+
+
+        //METODO PARA TRAER TODO SOBRE LAS FACTURAS PERO UTILIZANDO LOS DETALLES DE FACTURA
+
+
         public List<InvoiceDetail> GetAll()
         {
             List<InvoiceDetail> lst = new List<InvoiceDetail>();
@@ -38,6 +43,9 @@ namespace PIIPractica01.Data.Implementations
             return lst;
         }
 
+
+        //aca es igual que el anterior pero con ID
+
         public InvoiceDetail? GetById(int id)
         {
             List<SpParameter> param = new List<SpParameter>()
@@ -47,6 +55,7 @@ namespace PIIPractica01.Data.Implementations
                     Name = "@nro_factura",
                     Valor = id
                 }
+                
             };
 
             var dt = DataHelper.GetInstance().ExecuteSpQuery("SP_RECUPERAR_FACTURAS_POR_ID", param);
@@ -75,7 +84,7 @@ namespace PIIPractica01.Data.Implementations
         
 
 
-
+        //Transaccion de facturas y detalles facturas. No utilizo el UnitofWork porque no entiendo su funcionamiento.
         public bool Save(Invoice invoice)
         {
             bool result = true;
