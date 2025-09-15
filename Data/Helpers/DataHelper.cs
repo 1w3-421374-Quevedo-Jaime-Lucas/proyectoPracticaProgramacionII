@@ -107,10 +107,5 @@ namespace PIIPractica01.Data.Helpers
             return _connection;
         }
 
-        public bool ExecuteTransaction(string sp, SqlTransaction transaction, SqlConnection cnn, object parameterOut = null, List<SpParameter>? param = null)
-        {
-            return 0;
-
-        }
     }
 }

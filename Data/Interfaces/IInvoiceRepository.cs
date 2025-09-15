@@ -8,12 +8,12 @@ using PIIPractica01.Domain;
 
 namespace PIIPractica01.Data.Interfaces
 {
-    internal interface IInvoiceRepository
+    public interface IInvoiceRepository
     {
-        List<InvoiceDetail> GetAll();
-        InvoiceDetail? GetById(int id);
+        List<Invoice> GetAll();
+        List<Invoice> GetById(int id);
 
-        bool Save(Invoice invoice);
+        Invoice Save(Invoice invoice);
 
     }
 }

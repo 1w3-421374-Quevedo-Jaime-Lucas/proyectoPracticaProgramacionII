@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 using PIIPractica01.Data.Implementations;
 using PIIPractica01.Data.Interfaces;
 using PIIPractica01.Domain;
+using PIIPractica01.Services.InterfacesServices;
 
 namespace PIIPractica01.Services
 {
-    internal class ItemService
+    public class ItemService : IItemService
     {
         private IItemRepository _itemRepository;
 
-        public ItemService()
+        public ItemService(IItemRepository repository)
         {
-            _itemRepository = new ItemRepository();
+            _itemRepository = repository;
         }
         public List<Item> GetItems()
         {
@@ -30,6 +31,16 @@ namespace PIIPractica01.Services
         public bool SaveItem(Item item)
         {
             return _itemRepository.Save(item);
+        }
+
+        public bool DeleteItem(int id)
+        {
+            return _itemRepository.Delete(id);
+        }
+
+        public bool UpdateItem(Item item, int id)
+        {
+            return _itemRepository.Update(item, id);
         }
     }
 }

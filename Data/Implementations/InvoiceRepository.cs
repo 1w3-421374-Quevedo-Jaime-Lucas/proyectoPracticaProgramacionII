@@ -12,169 +12,173 @@ using PIIPractica01.Domain;
 
 namespace PIIPractica01.Data.Implementations
 {
-    internal class InvoiceRepository : IInvoiceRepository
+    public class InvoiceRepository : IInvoiceRepository
     {
+        InvoiceDetail InDe = new InvoiceDetail();
         PaymentForm paymentForm = new PaymentForm();
-        Item item = new Item();
 
 
-        //METODO PARA TRAER TODO SOBRE LAS FACTURAS PERO UTILIZANDO LOS DETALLES DE FACTURA
 
-
-        public List<InvoiceDetail> GetAll()
+        public List<Invoice> GetAll()
         {
-            List<InvoiceDetail> lst = new List<InvoiceDetail>();
-
+            var invoices = new Dictionary<int, Invoice>(); // clave: Nroinvoice
             var dt = DataHelper.GetInstance().ExecuteSpQuery("SP_RECUPERAR_FACTURAS");
 
             foreach (DataRow row in dt.Rows)
             {
-                InvoiceDetail InDe = new InvoiceDetail();
-                InDe.Invoice.Nroinvoice = (int)row[0];
-                InDe.Invoice.Client = (string)row[2];
-                InDe.Invoice.PaymentForm.Name = (string)row[6];
-                InDe.Invoice.Date = (DateTime)row[1];
-                InDe.Item.Name = (string)row[3];
-                InDe.SellPrice = (int)(double)row[4];
-                InDe.Amount = (int)row[5];
+                InDe.Item = new Item();
+                InDe.Item.Name = row[3].ToString();
+                InDe.SellPrice = Convert.ToInt32(row[4]);
+                InDe.Amount = Convert.ToInt32(row[5]);
 
-                lst.Add(InDe);
+                int nroInvoice = Convert.ToInt32(row[0]);
+
+                if (!invoices.ContainsKey(nroInvoice))
+                {
+                    Invoice invoice = new Invoice(InDe);
+
+                    invoice.Nroinvoice = nroInvoice;
+                    invoice.Date = (DateTime)row[1];
+                    invoice.Client = row[2].ToString();
+
+                    invoice.PaymentForm = new PaymentForm();
+                    invoice.PaymentForm.Name = row[6].ToString();
+
+                    invoices.Add(nroInvoice, invoice);
+                }
+                else
+                {
+                    Invoice invoice = invoices[nroInvoice];
+
+                    invoice.AddDetails(InDe);
+                }
             }
-            return lst;
+
+            return invoices.Values.ToList();
         }
 
 
-        //aca es igual que el anterior pero con ID
 
-        public InvoiceDetail? GetById(int id)
+
+
+        public List<Invoice> GetById(int id)
         {
             List<SpParameter> param = new List<SpParameter>()
-            {
-                new SpParameter()
-                {
-                    Name = "@nro_factura",
-                    Valor = id
-                }
-                
-            };
+    {
+        new SpParameter() { Name = "@nro_factura", Valor = id }
+    };
 
             var dt = DataHelper.GetInstance().ExecuteSpQuery("SP_RECUPERAR_FACTURAS_POR_ID", param);
 
+            var invoices = new Dictionary<int, Invoice>();
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                InvoiceDetail InDe = new InvoiceDetail();
+                foreach (DataRow row in dt.Rows)
                 {
-                    InDe.Invoice.Nroinvoice = (int)dt.Rows[0][0];
-                    InDe.Invoice.Client = (string)dt.Rows[0][2];
-                    InDe.Invoice.PaymentForm.Name = (string)dt.Rows[0][6];
-                    InDe.Invoice.Date = (DateTime)dt.Rows[0][1];
-                    InDe.Item.Name = (string)dt.Rows[0][3];
-                    InDe.SellPrice = (int)(double)dt.Rows[0][4];
-                    InDe.Amount = (int)dt.Rows[0][5];
+                    InDe.Item = new Item();
+                    InDe.Item.Name = row[3].ToString();
+                    InDe.SellPrice = Convert.ToInt32(row[4]);
+                    InDe.Amount = Convert.ToInt32(row[5]);
+
+                    int nroInvoice = Convert.ToInt32(row[0]);
+
+                    if (!invoices.ContainsKey(nroInvoice))
+                    {
+                        Invoice invoice = new Invoice(InDe);
+
+                        invoice.Nroinvoice = nroInvoice;
+                        invoice.Date = (DateTime)row[1];
+                        invoice.Client = row[2].ToString();
+
+                        invoice.PaymentForm = new PaymentForm();
+                        invoice.PaymentForm.Name = row[6].ToString();
+
+                        invoices.Add(nroInvoice, invoice);
+                    }
+                    else
+                    {
+                        Invoice invoice = invoices[nroInvoice];
+
+                        invoice.AddDetails(InDe);
+                    }
 
                 }
-                ;
 
-                return InDe;
+                return invoices.Values.ToList();
             }
 
-            return null;
+            return new List<Invoice>();
         }
-        
+
+
 
 
         //Transaccion de facturas y detalles facturas. No utilizo el UnitofWork porque no entiendo su funcionamiento.
-        public bool Save(Invoice invoice)
+        public Invoice Save(Invoice invoice)
         {
-            bool result = true;
             SqlTransaction? t = null;
             SqlConnection? cnn = null;
+
             try
             {
                 cnn = DataHelper.GetInstance().GetConnection();
-
                 cnn.Open();
-
-
                 t = cnn.BeginTransaction();
 
 
-                var cmd = new SqlCommand("SP_INSERTAR_MAESTRO_FACTURAS", cnn, t);
-
-                cmd.CommandType = CommandType.StoredProcedure;
+                var cmd = new SqlCommand("SP_INSERTAR_MAESTRO_FACTURAS", cnn, t)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
 
                 cmd.Parameters.AddWithValue("@cliente", invoice.Client);
                 cmd.Parameters.AddWithValue("@id_forma_pago", invoice.PaymentForm.Id);
 
-                //parametro de salida
-                SqlParameter param = new SqlParameter("@id", SqlDbType.Int);
-                param.Direction = ParameterDirection.Output;
+                SqlParameter param = new SqlParameter("@id", SqlDbType.Int)
+                {
+                    Direction = ParameterDirection.Output
+                };
                 cmd.Parameters.Add(param);
+
                 cmd.ExecuteNonQuery();
-
-
                 int InvoiceID = (int)param.Value;
+
+
+                invoice.Nroinvoice = InvoiceID;
 
                 foreach (var detail in invoice.GetDetails())
                 {
-
-                    var cmdDetail = new SqlCommand("sp_AGREGAR_DETALLE", cnn, t);
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    var cmdDetail = new SqlCommand("sp_AGREGAR_DETALLE", cnn, t)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
                     cmdDetail.Parameters.AddWithValue("@id_factura", InvoiceID);
                     cmdDetail.Parameters.AddWithValue("@id_articulo", detail.Item.Id);
                     cmdDetail.Parameters.AddWithValue("@cantidad", detail.Amount);
                     cmdDetail.Parameters.AddWithValue("@precio_vendido", detail.SellPrice);
+
                     cmdDetail.ExecuteNonQuery();
-
-
-
-
-                    return result;
-
                 }
+
                 t.Commit();
 
 
-
-
+                return invoice;
             }
             catch (SqlException)
             {
-
-                if (t != null)
-                    t.Rollback();
-
-                return result;
+                t?.Rollback();
+                throw;
             }
             finally
             {
-                if (cnn != null & cnn.State == ConnectionState.Open)
+                if (cnn != null && cnn.State == ConnectionState.Open)
                 {
                     cnn.Close();
                 }
-
             }
-
-
-            return result;
-
-
-
-
-
-            //List<SpParameter> param = new List<SpParameter>()
-            //{
-            //    new SpParameter("@id_forma_pago", invoice.PaymentForm.Id),
-            //    new SpParameter("@id_cliente", invoice.Client.Id)
-            //};
-
-            //return DataHelper.GetInstance().ExecuteSpDml("SP_INSERTAR_MAESTRO_FACTURAS", param);
-
         }
-
-
-
 
     }
 }

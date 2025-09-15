@@ -9,9 +9,10 @@ namespace PIIPractica01.Domain
     public class Item
     {
         public string Name { get; set; }
-        public int UnitPrice { get; set; }
+        public decimal UnitPrice { get; set; }
         public int Id { get; set; }
 
+        public bool IsActive { get; set; }
 
 
         public override string ToString()

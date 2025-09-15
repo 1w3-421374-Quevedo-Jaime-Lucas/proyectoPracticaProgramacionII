@@ -7,7 +7,7 @@ using PIIPractica01.Domain;
 
 namespace PIIPractica01.Data.Interfaces
 {
-    internal interface IItemRepository
+    public interface IItemRepository
     {
         List<Item> GetAll();
         Item? GetById(int id);
@@ -16,7 +16,7 @@ namespace PIIPractica01.Data.Interfaces
 
         bool Delete(int id);
 
-
+        bool Update(Item item, int id);
 
     }
 }

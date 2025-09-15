@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PIIPractica01.Data.Helpers
 {
-    internal class SpParameter
+    public class SpParameter
     {
 
         public string Name { get; set; }

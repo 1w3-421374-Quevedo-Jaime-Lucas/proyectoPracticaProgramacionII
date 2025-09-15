@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using PIIPractica01.Data.Implementations;
 using PIIPractica01.Data.Interfaces;
 using PIIPractica01.Domain;
+using PIIPractica01.Services.InterfacesServices;
 
 namespace PIIPractica01.Services
 {
-    internal class InvoiceService
+    public class InvoiceService : IInvoiceService
     {
         private IInvoiceRepository _repository;
-
         public InvoiceService()
         {
 
@@ -20,17 +20,17 @@ namespace PIIPractica01.Services
 
         }
 
-        public List<InvoiceDetail> GetInvoices()
+        public List<Invoice> GetInvoices()
         {
             return _repository.GetAll();
         }
 
-        public InvoiceDetail? GetInvoice(int id)
+        public List<Invoice> GetInvoice(int id)
         {
             return _repository.GetById(id);
         }
 
-        public bool SaveInvoice(Invoice invoice)
+        public Invoice SaveInvoice(Invoice invoice)
         {
             return _repository.Save(invoice);
         }
