@@ -78,11 +78,13 @@ GO
 -- Insertar factura maestra
 CREATE PROCEDURE SP_INSERTAR_MAESTRO_FACTURAS
     @id_forma_pago INT,
-    @cliente Varchar(50)
+    @cliente Varchar(50),
+	@id int OUTPUT
 AS
 BEGIN
     INSERT INTO FACTURAS (id_forma_Pago, fecha, cliente)
     VALUES (@id_forma_pago, GETDATE(), @cliente);
+	SET @id = SCOPE_IDENTITY();
 END;
 GO
 
@@ -153,6 +155,9 @@ Begin INSERT INTO articulos(nombre, precio_unitario, esta_activo)
 			go
 
 
+			SELECT * FROM ARTICULOS
+
+
 CREATE PROCEDURE SP_ElIMINAR_ARTICULOS
 @id int
 
@@ -161,11 +166,12 @@ Begin
 
 			Update ARTICULOS 
 			Set esta_activo = 0 
-			WHERE @id = id
+			WHERE id = @id
 
 
 END;
 go
+
 
 
 CREATE PROCEDURE SP_EDITAR_ARTICULOS
@@ -177,8 +183,8 @@ As
 Begin 
 
 			Update ARTICULOS
-			Set nombre = @nombre,
-				precio_unitario = @precio_unitario
+			set nombre = ISNULL(@nombre, nombre),
+        precio_unitario = ISNULL(@precio_unitario, precio_unitario)
 			WHERE @id = id
 
 
