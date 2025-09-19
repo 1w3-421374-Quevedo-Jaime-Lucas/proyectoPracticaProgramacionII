@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ApiEF.Data.Models;
 using PIIPractica01.Domain;
 
 namespace PIIPractica01.Data.Interfaces
 {
     public interface IItemRepository
     {
-        List<Item> GetAll();
-        Item? GetById(int id);
+        List<Articulo> GetAll();
+        Articulo? GetById(int id);
 
-        bool Save(Item item);
+        bool Save(Articulo articulo);
 
         bool Delete(int id);
 
-        bool Update(Item item, int id);
+        bool Update(Articulo articulo, int id);
 
     }
 }

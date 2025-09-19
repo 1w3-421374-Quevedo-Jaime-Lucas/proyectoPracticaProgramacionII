@@ -1,0 +1,98 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "Practica01DbContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "MinimumProductVersion": "2.6.1130",
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Data\\Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Api-EF",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[ARTICULOS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[DETALLES_FACTURAS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FACTURAS]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[FORMAS_PAGO]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[sp_AGREGAR_DETALLE]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_EDITAR_ARTICULOS]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_ElIMINAR_ARTICULOS]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_GUARDAR_ARTICULOS]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_INSERTAR_MAESTRO_FACTURAS]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_RECUPERAR_ARTICULOS_POR_ID]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_RECUPERAR_ARTICULOS]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_RECUPERAR_FACTURAS_POR_ID]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[SP_RECUPERAR_FACTURAS]",
+         "ObjectType": 1
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}

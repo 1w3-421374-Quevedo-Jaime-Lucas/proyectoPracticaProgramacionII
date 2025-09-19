@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ApiEF.Data.Models;
 using PIIPractica01.Data.Helpers;
 using PIIPractica01.Data.Interfaces;
 using PIIPractica01.Domain;
@@ -12,126 +13,68 @@ namespace PIIPractica01.Data.Implementations
 {
     public class ItemRepository : IItemRepository
     {
-        private readonly DataHelper _dataHelper;
-
-        public ItemRepository()
-        {
-            _dataHelper = DataHelper.GetInstance();
-        }
-
-
-
-        List<Item> IItemRepository.GetAll()
+        private Practica01DbContext _dbContext;
+        
+        public ItemRepository(Practica01DbContext context)
         {
 
-            List<Item> lst = new List<Item>();
-            var dt = DataHelper.GetInstance().ExecuteSpQuery("SP_RECUPERAR_ARTICULOS");
-
-            foreach (DataRow row in dt.Rows)
-            {
-                Item I = new Item
-                {
-                    Id = Convert.ToInt32(row["Id"]),
-                    Name = row["Nombre"].ToString(),
-                    UnitPrice = Convert.ToDecimal(row["Precio_Unitario"]),
-                    IsActive = true
-
-                };
-                lst.Add(I);
-            }
-            return lst;
-
+            _dbContext = context;
 
         }
 
-        Item? IItemRepository.GetById(int id)
+        public bool Delete(int id)
         {
-            List<SpParameter> param = new List<SpParameter>()
+            var articuloDelete = GetById(id);
+            if (articuloDelete != null)
             {
-                new SpParameter()
-                {
-                    Name = "@id",
-                    Valor = id
-                }
-            };
-
-            var dt = DataHelper.GetInstance().ExecuteSpQuery("SP_RECUPERAR_ARTICULOS_POR_ID", param);
-
-
-            if (dt != null && dt.Rows.Count > 0)
-            {
-                Item I = new Item()
-                {
-                    Id = (int)dt.Rows[0]["id"],
-                    Name = (string)dt.Rows[0]["nombre"],
-                    UnitPrice = (decimal)dt.Rows[0]["precio_Unitario"],
-                    IsActive = true
-
-                };
-
-                return I;
-            }
-
-            return null;
-        }
-
-        bool IItemRepository.Save(Item item)
-        {
-
-            List<SpParameter> param = new List<SpParameter>();
-
-            if (string.IsNullOrWhiteSpace(item.Name) || item.Name.Trim().ToLower() == "string")
-            {
-
-                param.Add(new SpParameter("@nombre", DBNull.Value));
+                _dbContext.Articulos.Remove(articuloDelete);
+                _dbContext.SaveChanges();
+                return true;
             }
             else
             {
-                param.Add(new SpParameter("@nombre", item.Name));
-
+                return false;
             }
-            // Validar unitPrice: solo si es mayor a 0
-            if (item.UnitPrice > 0)
+        }
+
+        public List<Articulo> GetAll()
+        {
+            return _dbContext.Articulos.ToList();
+        }
+
+        public Articulo? GetById(int id)
+        {
+            return _dbContext.Articulos.Find(id);
+        }
+        
+        public bool Save(Articulo articulo)
+        {
+            if (articulo != null)
             {
-                param.Add(new SpParameter("@precio_unitario", item.UnitPrice));
+
+                _dbContext.Articulos.Add(articulo);
+                _dbContext.SaveChanges();
+                return true;
             }
             else
             {
-                param.Add(new SpParameter("@precio_unitario", DBNull.Value));
+                return false;
             }
-
-                return DataHelper.GetInstance().ExecuteSpDml("SP_GUARDAR_ARTICULOS", param);
-
+              
         }
 
-        bool IItemRepository.Delete(int id)
+        public bool Update(Articulo articulo, int id)
         {
-            List<SpParameter> sp = new List<SpParameter>();
-
-            sp.Add(new SpParameter()
+            if (articulo != null)
             {
-                Name = "@id",
-                Valor = id
-            });
-
-            return DataHelper.GetInstance().ExecuteSpDml("SP_ElIMINAR_ARTICULOS", sp);
-
-        }
-
-        public bool Update(Item item, int id)
-        {
-
-            List<SpParameter> param = new List<SpParameter>()
+                _dbContext.Articulos.Update(articulo);
+                _dbContext.SaveChanges();
+                return true;
+            }
+            else
             {
-                new SpParameter("@nombre", item.Name),
-                new SpParameter("@precio_unitario", item.UnitPrice),
-                new SpParameter("@id", id)
-            };
-
-            return DataHelper.GetInstance().ExecuteSpDml("SP_EDITAR_ARTICULOS", param);
-
-
-
+                return false;
+            }
         }
     }
 }
